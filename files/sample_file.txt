@@ -1,0 +1,2 @@
+Ceci est un fichier d'exemple déployé par Ansible.
+Tu peux le remplacer par n'importe quel binaire ou fichier statique.

@@ -1,0 +1,13 @@
+# Variables globales utilisables sur tous les hôtes
+ansible_python_interpreter: /usr/bin/python3
+package_update: true
+ntp_server: pool.ntp.org
+
+
+# Variables pour les paquets multi-distro
+pkg_map:
+Debian: apache2
+Ubuntu: apache2
+RedHat: httpd
+CentOS: httpd
+Amazon: httpd

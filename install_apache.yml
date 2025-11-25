@@ -1,0 +1,67 @@
+---
+- name: Install web stack (generic)
+hosts: webservers
+become: true
+gather_facts: true
+
+
+pre_tasks:
+- name: Update package cache (distro-specific)
+package:
+name: "{{ item }}"
+state: present
+loop: []
+when: false
+- name: Ensure package cache is up-to-date
+ansible.builtin.package:
+name: "{{ (ansible_facts['pkg_mgr'] if ansible_facts is defined else 'yum') }}"
+state: present
+when: false
+
+
+tasks:
+- name: Ensure python3 is present
+package:
+name: python3
+state: present
+
+
+- name: Install web server package (Debian/RedHat generic)
+package:
+name: "{{ pkg_map[ansible_facts['os_family']] if ansible_facts is defined else 'apache2' }}"
+state: present
+
+
+- name: Create web root directory
+file:
+path: "{{ web_root }}"
+state: directory
+owner: root
+group: root
+mode: '0755'
+
+
+- name: Deploy sample index.html
+copy:
+content: "<html><body><h1>Hello from {{ inventory_hostname }}</h1><p>{{ custom_message | default('Welcome') }}</p></body></html>"
+dest: "{{ web_root }}/{{ sample_index }}"
+owner: root
+group: root
+mode: '0644'
+notify: Restart web service
+
+
+- name: Copy a sample file
+copy:
+src: files/sample_file.txt
+dest: "{{ web_root }}/sample_file.txt"
+owner: root
+group: root
+mode: '0644'
+
+
+handlers:
+- name: Restart web service
+service:
+name: "{{ pkg_map[ansible_facts['os_family']] if ansible_facts is defined else 'apache2' }}"
+state: restarted

@@ -1,0 +1,5 @@
+# Variables spécifiques au groupe webservers
+http_listen_port: 80
+web_root: /var/www/html
+sample_index: index.html
+service_name: "{{ pkg_map[(ansible_facts['os_family'] if ansible_facts is defined else 'Debian')] }}"

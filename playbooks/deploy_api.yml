@@ -40,14 +40,6 @@
       args:
         chdir: /opt/api
 
-    - name: Ouvrir le port 5000
-      firewalld:
-        port: 5000/tcp
-        permanent: yes
-        state: enabled
-        immediate: yes
-      ignore_errors: yes
-
     - name: Attendre que l'API démarre
       wait_for:
         port: 5000

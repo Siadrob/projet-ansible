@@ -1,0 +1,65 @@
+---
+- name: Déployer une API Python simple
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Installer Python et pip
+      yum:
+        name:
+          - python3
+          - python3-pip
+        state: present
+
+    - name: Créer le dossier de l'app
+      file:
+        path: /opt/api
+        state: directory
+        mode: '0755'
+
+    - name: Copier l'application
+      copy:
+        src: ../files/app.py
+        dest: /opt/api/app.py
+        mode: '0644'
+
+    - name: Copier requirements.txt
+      copy:
+        src: ../files/requirements.txt
+        dest: /opt/api/requirements.txt
+        mode: '0644'
+
+    - name: Installer Flask
+      pip:
+        requirements: /opt/api/requirements.txt
+        executable: pip3
+
+    - name: Lancer l'API en background
+      shell: |
+        nohup python3 /opt/api/app.py > /opt/api/api.log 2>&1 &
+      args:
+        chdir: /opt/api
+
+    - name: Ouvrir le port 5000
+      firewalld:
+        port: 5000/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+      ignore_errors: yes
+
+    - name: Attendre que l'API démarre
+      wait_for:
+        port: 5000
+        delay: 2
+        timeout: 10
+
+    - name: Tester l'API
+      uri:
+        url: http://localhost:5000/health
+        method: GET
+      register: api_test
+
+    - name: Afficher le résultat
+      debug:
+        msg: "API fonctionne ! Réponse: {{ api_test.json }}"

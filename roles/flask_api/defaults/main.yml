@@ -1,0 +1,6 @@
+# Variables par défaut (peuvent être surchargées)
+
+app_directory: /opt/flask-api
+app_port: 5000
+app_user: root
+app_env: production

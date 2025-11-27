@@ -1,0 +1,11 @@
+---
+- name: Déployer l'API Flask avec le rôle
+  hosts: webservers
+  become: yes
+
+  vars:
+    app_port: 8080           # Surcharge la valeur par défaut
+    app_directory: /var/www/api
+
+  roles:
+    - flask_api
